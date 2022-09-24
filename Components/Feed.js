@@ -1,38 +1,62 @@
-import React from "react";
-import { StyleSheet, Text, Image, View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, Image, View, FlatList } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+
+export default function Feed() {
+  const [stories, setStories]= useState([]);
+
+  useEffect(function(){
+      async function getData(){
+          const response= await fetch('https://mobile.ect.ufrn.br:3000/stories');
+          const stories= await response.json();
+          setStories(stories);
+      }
+      getData();
+  }, [])
+
+const feed= [
+  {
+    id: 1,
+    nome: 'Piu Piu',
+    imgPerfil: require('../assets/imagens/pernalonga.png'),
+    img: require('../assets/imagens/looneytunes.png'),
+    aspectRatio: 1.088,
+  },
+  {
+    id: 2,
+    nome: 'Pernalonga',
+    imgPerfil: require('../assets/imagens/pernalonga.png'),
+    img: require('../assets/imagens/looneytunes2.png'),
+    aspectRatio: 1.777,
+  },
+];
+
+function renderItem({ item }){
+  return <View style={styles.post}>
+  <View style={styles.postheader}>
+      <View style={styles.postheaderesquerda}>
+          <Image style={styles.postheaderimg} source={item.imgPerfil}></Image>
+          <Text>{item.nome}</Text>
+      </View>
+      <FontAwesome5 name="ellipsis-h" size={24} color="black"></FontAwesome5>
+  </View>
+  <Image style={styles.postimg} aspectRatio={item.aspectRatio} source={item.img}/>
+  <View style={styles.footer}>
+      <FontAwesome5 style={styles.footericon} name="heart" size={24} color="black"/>
+      <FontAwesome5 style={styles.footericon} name="comment" size={24} color="black"/>          
+  </View>
+</View>
+}
 
 export default function Feed() {
     return (
         <View style={styles.feed}>
-            <View style={styles.post}>
-                <View style={styles.postheader}>
-                    <View style={styles.postheaderesquerda}>
-                        <Image style={styles.postheaderimg} source={require('../assets/imagens/pernalonga.png')}></Image>
-                        <Text>Piu Piu</Text>
-                    </View>
-                    <FontAwesome5 name="ellipsis-h" size={24} color="black"></FontAwesome5>
-                </View>
-                <Image style={styles.postimg} aspectRatio={1.088} source={require('../assets/imagens/looneytunes.png')}/>
-                <View style={styles.footer}>
-                    <FontAwesome5 style={styles.footericon} name="heart" size={24} color="black"/>
-                    <FontAwesome5 style={styles.footericon} name="comment" size={24} color="black"/>          
-                </View>
-            </View>
-            <View style={styles.post}>
-                <View style={styles.postheader}>
-                    <View style={styles.postheaderesquerda}>
-                        <Image style={styles.postheaderimg} source={require('../assets/imagens/pernalonga.png')}></Image>
-                        <Text>Pernalonga</Text>
-                    </View>
-                    <FontAwesome5 name="ellipsis-h" size={24} color="black"></FontAwesome5>
-                </View>
-                <Image style={styles.postimg} aspectRatio={1.777} source={require('../assets/imagens/looneytunes2.png')}/>
-                <View style={styles.footer}>
-                    <FontAwesome5 style={styles.footericon} name="heart" size={24} color="black"/>
-                    <FontAwesome5 style={styles.footericon} name="comment" size={24} color="black"/>          
-                </View>
-            </View>
+          <FlatList
+          data= {feed}
+          renderItem= {renderItem}
+          keyExtractor= {item => item.id}
+          showsVerticalScrollIndicator= {false}
+          />          
       </View>        
     );
 }
